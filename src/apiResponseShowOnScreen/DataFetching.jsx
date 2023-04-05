@@ -79,48 +79,135 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import LoadingScreen from "./LoadingScreen";
-import TodoDisplayTable from "./TodoDisplayTable";
+import "bootstrap/dist/css/bootstrap.css";
+import Spinner from "react-bootstrap/Spinner";
+import Button from "react-bootstrap/Button";
 
 function DataFetching() {
   const [loading, setLoading] = useState(true);
   const [todoS, setTodoS] = useState([]);
   const [error, setError] = useState(false);
+  const [deleteState, setDeleteState] = useState(false);
+  const [pageNo, setPageNo] = useState(1);
 
   useEffect(() => {
     axios
-      .get(`https://jsonplaceholder.typicode.com/todos`)
+      .get(
+        `https://jsonplaceholder.typicode.com/todos?_page=${pageNo}&_limit=10`
+      )
       .then((res) => {
         setTodoS(res.data);
         setLoading(false);
         setError(false);
       })
       .catch((err) => {
-        console.log(err);
         setLoading(false);
-        setError(true);
-      });
-  }, []);
+        setError("Data can't fetch");
+      })
+      .finally(() => {
+        setDeleteState(false);
+      })
+  }, [pageNo]);
+
+  // const onPreviousBtnClick = () =>{
+  //   if(pageNo>=1){
+  //     setPageNo(pageNo-1);
+  //     axios
+  //     .get(`https://jsonplaceholder.typicode.com/todos?_page=${pageNo}&_limit=10`)
+  //     .then((res) => {
+  //       setTodoS(res.data);
+  //       setLoading(false);
+  //       setError(false);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //       setLoading(false);
+  //       setError(true);
+  //     });
+  //   }
+  // }
+
+  // const onNextBtnClick = () =>{
+  //   if(pageNo<20){
+  //     setPageNo(pageNo+1);
+
+  //     axios
+  //     .get(`https://jsonplaceholder.typicode.com/todos?_page=${pageNo}&_limit=10`)
+  //     .then((res) => {
+  //       setTodoS(res.data);
+  //       setLoading(false);
+  //       setError(false);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //       setLoading(false);
+  //       setError(true);
+  //     });
+  //   }
+  // }
 
   const handleDelete = (id) => {
+    setDeleteState(true);
     axios
       .delete(`https://jsonplaceholder.typicode.com/todos/${id}`)
       .then((res) => {
+        setDeleteState(false);
         setTodoS(todoS.filter((todo) => todo.id !== id));
-        setLoading(false);
+        
       })
       .catch((err) => {
-        console.log(err);
-        setError(true);
+        setError(err);
+      })
+      .finally(()=>{
+        console.log("todo deleted");
       });
   };
 
   return (
-    <div style={{background:"silver", margin:"5vw 20vw", padding:"4vw", color:"white", fontWeight:"800", letterSpacing:"2px", borderRadius:"30px"}}>
+    <div
+      className="bg-secondary m-5vw p-4 text-white font-weight-bold text-center"
+      style={{ borderRadius: "30px", height: "100vw" }}
+    >
       {loading ? (
-        <LoadingScreen />
+        <Spinner animation="border" variant="primary" />
+      ) : error ? (
+        <div>{alert(error)}</div>
       ) : (
-        <TodoDisplayTable loading={loading} setLoading={setLoading} todoTitleArray={todoS} handleDelete={handleDelete} />
+        <div>
+          {todoS.map((todo, index) => (
+            <div
+              className="d-flex justify-content-between p-1 "
+              // style={{ color: deleteState && "red" }}
+            >
+              <p>
+                {todo.id}
+                {")  "}
+                {todo.title}
+              </p>
+              <Button onClick={() => handleDelete(todo.id)}>Delete</Button>
+            </div>
+          ))}
+          <div className="d-flex justify-content-between">
+            <button
+              disabled={pageNo <= 1 ? true : false}
+              onClick={() => {
+                setPageNo(pageNo - 1);
+                console.log(pageNo);
+              }}
+            >
+              Prev
+            </button>
+            <button
+              disabled={pageNo >= 20 ? true : false}
+              onClick={() => {
+                setPageNo(pageNo + 1);
+                console.log(pageNo);
+              }}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

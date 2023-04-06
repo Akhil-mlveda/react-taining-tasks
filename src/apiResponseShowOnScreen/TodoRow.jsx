@@ -7,10 +7,10 @@ function TodoRow(props) {
 
   const [deleteState, setDeleteState] = useState(false);
 
-  useEffect(() => {
-    setDeleteState(false);
+  // useEffect(() => {
+  //   setDeleteState(false);
   
-  }, [todo])
+  // }, [todo])
   
 
   const onDeleteHandler = (id) => {

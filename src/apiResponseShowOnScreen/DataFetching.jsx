@@ -82,46 +82,86 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
 import Spinner from "react-bootstrap/Spinner";
 import TodoRow from "./TodoRow";
+import fetchTodos from "./ApiService";
+
+const INITIAL_PAGE_NUMBER = 1;
+const LIMIT = 10;
 
 function DataFetching() {
   const [loading, setLoading] = useState(true);
   const [todoS, setTodoS] = useState([]);
   const [error, setError] = useState(false);
-  const [pageNo, setPageNo] = useState(1);
+  const [pageNo, setPageNo] = useState(INITIAL_PAGE_NUMBER);
+  const [pageChange, setPageChange] = useState(false);
 
   useEffect(() => {
+      fetchTodos({
+        INITIAL_PAGE_NUMBER:INITIAL_PAGE_NUMBER,
+        LIMIT:LIMIT,
+        setTodoS:setTodoS,
+        setLoading:setLoading,
+        setError:setError,
+      });
+      
+  }, []);
+
+  const onPreviousBtnClick = () => {
+    setPageNo(pageNo - 1);
+    setPageChange(true);
+
+    // fetchTodos({
+    //   INITIAL_PAGE_NUMBER:pageNo-1,
+    //   LIMIT:LIMIT,
+    //   setTodoS:setTodoS, 
+    //   setError:setError,
+    //   setPageChange:setPageChange,
+    // });
     axios
       .get(`https://jsonplaceholder.typicode.com/todos`, {
         params: {
-          _page: pageNo,
+          _page: pageNo - 1,
           _limit: 10,
         },
       })
       .then((res) => {
         setTodoS(res.data);
-        setLoading(false);
+        setPageChange(false);
         setError(false);
       })
       .catch((err) => {
-        setLoading(false);
-        setError("Data can't fetch");
+        setPageChange(false);
+        setError(true);
       });
-  }, [pageNo]);
+    // }
+  };
+
+  const onNextBtnClick = () => {
+    setPageNo(pageNo + 1);
+    setPageChange(true);
+    axios
+      .get(`https://jsonplaceholder.typicode.com/todos`, {
+        params: {
+          _page: pageNo + 1,
+          _limit: 10,
+        },
+      })
+      .then((res) => {
+        setTodoS(res.data);
+        setPageChange(false);
+        setError(false);
+      })
+      .catch((err) => {
+        setPageChange(false);
+        setError(true);
+      });
+    // }
+  };
 
   const handleDelete = (id) => {
     axios
       .delete(`https://jsonplaceholder.typicode.com/todos/${id}`)
       .then((res) => {
         setTodoS(todoS.filter((todo) => todo.id !== id));
-
-        // setTodoS(
-        //   todoS.reduce((acc, todo) => {
-        //     if (todo.id !== id) {
-        //       acc.push(todo);
-        //     }
-        //     return acc;
-        //   }, [])
-        // );
         setError(false);
       })
       .catch((err) => {
@@ -149,20 +189,14 @@ function DataFetching() {
           ))}
           <div className="d-flex justify-content-between">
             <button
-              disabled={pageNo <= 1 ? true : false}
-              onClick={() => {
-                setPageNo(pageNo - 1);
-                console.log(pageNo);
-              }}
+              disabled={pageNo <= 1 || pageChange ? true : false}
+              onClick={onPreviousBtnClick}
             >
               Prev
             </button>
             <button
-              disabled={pageNo >= 20 ? true : false}
-              onClick={() => {
-                setPageNo(pageNo + 1);
-                console.log(pageNo);
-              }}
+              disabled={pageNo >= 20 || pageChange ? true : false}
+              onClick={onNextBtnClick}
             >
               Next
             </button>

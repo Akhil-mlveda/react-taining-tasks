@@ -1,88 +1,90 @@
-/* eslint-disable jsx-a11y/img-redundant-alt */
-// import React, { useState, useEffect } from "react";
-// import axios from "axios";
+// // /* eslint-disable jsx-a11y/img-redundant-alt */
+// // // import React, { useState, useEffect } from "react";
+// // // import axios from "axios";
 
-// function DataFetching() {
-//   // const [posts, setPosts] = useState([ ]);
-//   const [post, setPost] = useState({});
-//   const [id, setId] = useState(1);
-//   const [idFromButtonClick, setIdFromButtonClick] = useState(1)
+// // // function DataFetching() {
+// // //   // const [posts, setPosts] = useState([ ]);
+// // //   const [post, setPost] = useState({});
+// // //   const [id, setId] = useState(1);
+// // //   const [idFromButtonClick, setIdFromButtonClick] = useState(1)
 
-//   const handleClick = () => {
-//     setIdFromButtonClick(id);
-//   }
-//   useEffect(() => {
-//     axios
-//       .get(`https://jsonplaceholder.typicode.com/posts/${idFromButtonClick}`)
-//       .then((res) => {
-//         console.log(res);
-//         setPost(res.data);
-//       })
-//       .catch((err) => {
-//         console.log(err);
-//       })
+// // //   const handleClick = () => {
+// // //     setIdFromButtonClick(id);
+// // //   }
+// // //   useEffect(() => {
+// // //     axios
+// // //       .get(`https://jsonplaceholder.typicode.com/posts/${idFromButtonClick}`)
+// // //       .then((res) => {
+// // //         console.log(res);
+// // //         setPost(res.data);
+// // //       })
+// // //       .catch((err) => {
+// // //         console.log(err);
+// // //       })
 
-//     // return () => {
-//     //   second;
-//     // };
-//   }, [idFromButtonClick]);
+// // //     // return () => {
+// // //     //   second;
+// // //     // };
+// // //   }, [idFromButtonClick]);
 
-//   return (
-//     <div>
-//     <input type="text" value={id} onChange={e => setId(e.target.value)} />
-//     <button type="button" onClick={handleClick}>Fetch Post</button>
-//     <div>{post.title}</div>
-//       {/* <ul>
-//         {posts.map(post => (
-//           <li key={post.id}>{post.title}</li>
-//         ))}
-//       </ul> */}
-//     </div>
-//   );
-// }
+// // //   return (
+// // //     <div>
+// // //     <input type="text" value={id} onChange={e => setId(e.target.value)} />
+// // //     <button type="button" onClick={handleClick}>Fetch Post</button>
+// // //     <div>{post.title}</div>
+// // //       {/* <ul>
+// // //         {posts.map(post => (
+// // //           <li key={post.id}>{post.title}</li>
+// // //         ))}
+// // //       </ul> */}
+// // //     </div>
+// // //   );
+// // // }
 
-// export default DataFetching;
+// // // export default DataFetching;
 
-// import React,{useState, useEffect} from 'react'
-// import axios from 'axios'
-// import LoadingImg from './Spinner.gif'
+// // // import React,{useState, useEffect} from 'react'
+// // // import axios from 'axios'
+// // // import LoadingImg from './Spinner.gif'
 
-// function DataFetching() {
-//   const [loading, setLoading] = useState(true);
-//   const [todos, setTodos] = useState([]);
-//   const [error, setError] = useState(false);
+// // // function DataFetching() {
+// // //   const [loading, setLoading] = useState(true);
+// // //   const [todos, setTodos] = useState([]);
+// // //   const [error, setError] = useState(false);
 
-//   useEffect(() => {
-//     axios
-//       .get(`https://jsonplaceholder.typicode.com/users`)
-//       .then((res) => {
-//         setTodos(res.data);
-//         setLoading(false);
-//         setError(false);
-//       })
-//       .catch((err) => {
-//         console.log(err);
-//         setError(true);
-//       })
+// // //   useEffect(() => {
+// // //     axios
+// // //       .get(`https://jsonplaceholder.typicode.com/users`)
+// // //       .then((res) => {
+// // //         setTodos(res.data);
+// // //         setLoading(false);
+// // //         setError(false);
+// // //       })
+// // //       .catch((err) => {
+// // //         console.log(err);
+// // //         setError(true);
+// // //       })
 
-//   }, [])
+// // //   }, [])
 
-//   return (
-//     <div>
-//     {loading && <img src={LoadingImg} alt='Loading Image' style={{width:'60%', height:'60%', }}/>}
+// // //   return (
+// // //     <div>
+// // //     {loading && <img src={LoadingImg} alt='Loading Image' style={{width:'60%', height:'60%', }}/>}
 
-//     </div>
-//   )
-// }
+// // //     </div>
+// // //   )
+// // // }
 
-// export default DataFetching
+// // // export default DataFetching
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
 import Spinner from "react-bootstrap/Spinner";
 import TodoRow from "./TodoRow";
-import fetchTodos from "./ApiService";
+import { fetchTodos, deleteTodo } from "./ApiServices";
+import ErrorBoundaries from "../advancedTopicsContext/ErrorBoundaries";
+import BuggyCounter from "../advancedTopicsContext/BuggyCounter";
 
 const INITIAL_PAGE_NUMBER = 1;
 const LIMIT = 10;
@@ -93,36 +95,26 @@ function DataFetching() {
   const [error, setError] = useState(false);
   const [pageNo, setPageNo] = useState(INITIAL_PAGE_NUMBER);
   const [pageChange, setPageChange] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
 
   useEffect(() => {
-      fetchTodos({
-        INITIAL_PAGE_NUMBER:INITIAL_PAGE_NUMBER,
-        LIMIT:LIMIT,
-        setTodoS:setTodoS,
-        setLoading:setLoading,
-        setError:setError,
+    fetchTodos(INITIAL_PAGE_NUMBER, LIMIT)
+      .then((res) => {
+        setTodoS(res.data);
+        setLoading(false);
+        setError(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+        setError("Data can't fetch");
       });
-      
   }, []);
 
   const onPreviousBtnClick = () => {
     setPageNo(pageNo - 1);
     setPageChange(true);
 
-    // fetchTodos({
-    //   INITIAL_PAGE_NUMBER:pageNo-1,
-    //   LIMIT:LIMIT,
-    //   setTodoS:setTodoS, 
-    //   setError:setError,
-    //   setPageChange:setPageChange,
-    // });
-    axios
-      .get(`https://jsonplaceholder.typicode.com/todos`, {
-        params: {
-          _page: pageNo - 1,
-          _limit: 10,
-        },
-      })
+    fetchTodos(pageNo - 1, LIMIT)
       .then((res) => {
         setTodoS(res.data);
         setPageChange(false);
@@ -132,19 +124,13 @@ function DataFetching() {
         setPageChange(false);
         setError(true);
       });
-    // }
   };
 
   const onNextBtnClick = () => {
     setPageNo(pageNo + 1);
     setPageChange(true);
-    axios
-      .get(`https://jsonplaceholder.typicode.com/todos`, {
-        params: {
-          _page: pageNo + 1,
-          _limit: 10,
-        },
-      })
+
+    fetchTodos(pageNo + 1, LIMIT)
       .then((res) => {
         setTodoS(res.data);
         setPageChange(false);
@@ -154,18 +140,17 @@ function DataFetching() {
         setPageChange(false);
         setError(true);
       });
-    // }
   };
 
   const handleDelete = (id) => {
-    axios
-      .delete(`https://jsonplaceholder.typicode.com/todos/${id}`)
-      .then((res) => {
-        setTodoS(todoS.filter((todo) => todo.id !== id));
-        setError(false);
+    setDeleteError(false);
+    deleteTodo(id)
+      .then(() => {
+        setTodoS((todoS) => todoS.filter((todo) => todo.id !== id));
+        setDeleteError(false);
       })
       .catch((err) => {
-        setError("Data can't Delete try again");
+        setDeleteError("Data can't Delete try again");
       });
   };
 
@@ -185,6 +170,7 @@ function DataFetching() {
               key={currTodo.id}
               todo={currTodo}
               handleDelete={handleDelete}
+              deleteError={deleteError}
             />
           ))}
           <div className="d-flex justify-content-between">

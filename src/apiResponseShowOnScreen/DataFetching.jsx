@@ -1,90 +1,9 @@
-// // /* eslint-disable jsx-a11y/img-redundant-alt */
-// // // import React, { useState, useEffect } from "react";
-// // // import axios from "axios";
-
-// // // function DataFetching() {
-// // //   // const [posts, setPosts] = useState([ ]);
-// // //   const [post, setPost] = useState({});
-// // //   const [id, setId] = useState(1);
-// // //   const [idFromButtonClick, setIdFromButtonClick] = useState(1)
-
-// // //   const handleClick = () => {
-// // //     setIdFromButtonClick(id);
-// // //   }
-// // //   useEffect(() => {
-// // //     axios
-// // //       .get(`https://jsonplaceholder.typicode.com/posts/${idFromButtonClick}`)
-// // //       .then((res) => {
-// // //         console.log(res);
-// // //         setPost(res.data);
-// // //       })
-// // //       .catch((err) => {
-// // //         console.log(err);
-// // //       })
-
-// // //     // return () => {
-// // //     //   second;
-// // //     // };
-// // //   }, [idFromButtonClick]);
-
-// // //   return (
-// // //     <div>
-// // //     <input type="text" value={id} onChange={e => setId(e.target.value)} />
-// // //     <button type="button" onClick={handleClick}>Fetch Post</button>
-// // //     <div>{post.title}</div>
-// // //       {/* <ul>
-// // //         {posts.map(post => (
-// // //           <li key={post.id}>{post.title}</li>
-// // //         ))}
-// // //       </ul> */}
-// // //     </div>
-// // //   );
-// // // }
-
-// // // export default DataFetching;
-
-// // // import React,{useState, useEffect} from 'react'
-// // // import axios from 'axios'
-// // // import LoadingImg from './Spinner.gif'
-
-// // // function DataFetching() {
-// // //   const [loading, setLoading] = useState(true);
-// // //   const [todos, setTodos] = useState([]);
-// // //   const [error, setError] = useState(false);
-
-// // //   useEffect(() => {
-// // //     axios
-// // //       .get(`https://jsonplaceholder.typicode.com/users`)
-// // //       .then((res) => {
-// // //         setTodos(res.data);
-// // //         setLoading(false);
-// // //         setError(false);
-// // //       })
-// // //       .catch((err) => {
-// // //         console.log(err);
-// // //         setError(true);
-// // //       })
-
-// // //   }, [])
-
-// // //   return (
-// // //     <div>
-// // //     {loading && <img src={LoadingImg} alt='Loading Image' style={{width:'60%', height:'60%', }}/>}
-
-// // //     </div>
-// // //   )
-// // // }
-
-// // // export default DataFetching
-
 import React, { useState, useEffect } from "react";
-// import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
 import Spinner from "react-bootstrap/Spinner";
 import TodoRow from "./TodoRow";
 import { fetchTodos, deleteTodo } from "./ApiServices";
-import ErrorBoundaries from "../advancedTopicsContext/ErrorBoundaries";
-import BuggyCounter from "../advancedTopicsContext/BuggyCounter";
+import ErrorBoundary from "../advancedTopicsContext/ErrorBoundary";
 
 const INITIAL_PAGE_NUMBER = 1;
 const LIMIT = 10;
@@ -141,7 +60,9 @@ function DataFetching() {
         setError(true);
       });
   };
-
+  // const setTodoSS =(id) => {
+  //   (todoS.filter((todo) => todo.id !== id))
+  // }
   const handleDelete = (id) => {
     setDeleteError(false);
     deleteTodo(id)
@@ -151,9 +72,24 @@ function DataFetching() {
       })
       .catch((err) => {
         setDeleteError("Data can't Delete try again");
+        // throw new Error("can't delete");
       });
   };
 
+  if (error) {
+    throw new Error("can not fetching data from api");
+  }
+
+  // {/* <div>{alert(error)}</div> */}
+  // const todoItems = todoS.map((currTodo, index) => (
+  //     <TodoRow
+  //       key={currTodo.id}
+  //       todo={currTodo}
+  //       // setTodoS={setTodoSS}
+  //       onHandleDelete={handleDelete}
+  //       deleteError={deleteError}
+  //     ></TodoRow>
+  // ));
   return (
     <div
       className="bg-secondary m-5vw p-4 text-white font-weight-bold text-center"
@@ -161,18 +97,23 @@ function DataFetching() {
     >
       {loading ? (
         <Spinner animation="border" variant="primary" />
-      ) : error ? (
-        <div>{alert(error)}</div>
-      ) : (
+      ) : !error ? (
         <div>
+          {/* <ErrorBoundary>{todoItems}</ErrorBoundary>
+           */}
+
           {todoS.map((currTodo, index) => (
-            <TodoRow
-              key={currTodo.id}
-              todo={currTodo}
-              handleDelete={handleDelete}
-              deleteError={deleteError}
-            />
+            <ErrorBoundary>
+              <TodoRow
+                key={currTodo.id}
+                todo={currTodo}
+                // setTodoS={setTodoSS}
+                onHandleDelete={handleDelete}
+                deleteError={deleteError}
+              ></TodoRow>
+            </ErrorBoundary>
           ))}
+
           <div className="d-flex justify-content-between">
             <button
               disabled={pageNo <= 1 || pageChange ? true : false}
@@ -187,6 +128,10 @@ function DataFetching() {
               Next
             </button>
           </div>
+        </div>
+      ) : (
+        <div>
+          <h1>can't fetching data</h1>
         </div>
       )}
     </div>

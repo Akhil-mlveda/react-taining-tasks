@@ -1,11 +1,18 @@
 import React from 'react';
 
 
-export default class ErrorBoundary extends React.Component {
+class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
     this.state = { error: null, errorInfo: null };
   }
+
+  // static getDerivedStateFromError(error){
+  //   this.setState({
+  //     error: error,
+  //     errorInfo: error.errorInfo,
+  //   });
+  // }
 
   componentDidCatch(error, errorInfo) {
      
@@ -13,12 +20,12 @@ export default class ErrorBoundary extends React.Component {
       error: error,
       errorInfo: errorInfo,
     });
-     
+    console.log(error);
+    console.log(errorInfo);
   }
 
   render() {
     if (this.state.errorInfo) {
-      // Error path
       return (
         <div>
           <h2>Something went wrong.</h2>
@@ -33,3 +40,6 @@ export default class ErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+
+
+export default ErrorBoundary;

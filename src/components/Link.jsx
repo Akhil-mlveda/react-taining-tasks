@@ -13,9 +13,9 @@ const Link = ({ className, href, children }) => {
     // update url
     window.history.pushState({}, "", href);
 
-    // // communicate to Routes that URL has changed
-    // const navEvent = new PopStateEvent('popstate');
-    // window.dispatchEvent(navEvent);
+    // communicate to Routes that URL has changed
+    const navEvent = new PopStateEvent('popstate');
+    window.dispatchEvent(navEvent);
   };
 
   return (

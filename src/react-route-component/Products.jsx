@@ -8,6 +8,7 @@ export const Products = () => {
         <input type="search" placeholder="Search products" />
       </div>
       <nav>
+      {/* relative links -> no / construct throw current url       absolute link -> /    construct the path from root*/}
         <Link to="featured">Featured</Link>
         {" "}
         <Link to="new">New</Link>
